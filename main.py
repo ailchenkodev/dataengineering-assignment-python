@@ -1,16 +1,49 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import pandas as pd
+from chunker import chunk_dataframe
+import pytest
+import sys
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def run_chunker_example():
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    dfs = pd.date_range("2023-01-01 00:00:00", "2023-01-01 00:00:05", freq="s")
+    df = pd.DataFrame({"dt": dfs.repeat(3)})
+    df.head(10)
+
+    # print(df[::]["dt"])
+
+    # df = pd.DataFrame(
+    #     {
+    #         "dt": [
+    #             "2023-01-01 00:00:02",
+    #             "2023-01-01 00:00:02",
+    #             "2023-01-01 00:00:02",
+    #             "2023-01-01 00:00:01",
+    #             "2023-01-01 00:00:01",
+    #             "2023-01-01 00:00:03",
+    #         ]
+    #     }
+    #  )
+
+    for i in chunk_dataframe(df, 4, 'dt', True):
+        print(i[::]["dt"])
+
+def run_tests():
+    """Запуск всех тестов с помощью pytest."""
+    exit_code = pytest.main(["-v", "tests"])
+    sys.exit(exit_code)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Запуск примера или тестов.")
+    parser.add_argument('--test', action='store_true', help="Запуск юнит-тестов")
+
+    args = parser.parse_args()
+
+    if args.test:
+        run_tests()
+    else:
+        run_chunker_example()
+
